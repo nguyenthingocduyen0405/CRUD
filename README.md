@@ -43,8 +43,8 @@
 ### 1 저장소 복제
 
 ```sh
-git clone [저장소 URL]
-cd [저장소 폴더]
+git clone https://github.com/nguyenthingocduyen0405/CRUD.git
+cd CRUD
 ```
 
 ### 2 백엔드 준비와 실행
