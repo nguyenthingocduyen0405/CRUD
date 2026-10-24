@@ -1,0 +1,75 @@
+﻿==============================================================================
+API test log (phase: main) run at 2026-10-24T17:50:32.101979+00:00 UTC
+server: http://127.0.0.1:8000, TOKEN_TTL=90, tool: python urllib script, tokens masked
+==============================================================================
+T02 | POST /api/auth/login | login Alice -> HTTP 200 | accessToken=eyJhbGciOiJI..(masked)..Bm-peE expiresIn=90 user={'id': 1, 'name': 'Alice', 'email': 'alice@class.test'}
+T02 | POST /api/auth/login | login Bob -> HTTP 200 | accessToken=eyJhbGciOiJI..(masked)..mdC_7Y user={'id': 2, 'name': 'Bob', 'email': 'bob@class.test'}
+T01 | GET /api/posts | public list, no token -> HTTP 200 | array len=3
+T01 | GET /api/posts/7 | public detail, no token -> HTTP 200 | title='삭제 테스트 수정' authorName=Alice
+T03 | POST /api/auth/login | wrong password -> HTTP 401 code=INVALID_CREDENTIALS | no token issued
+T03 | POST /api/auth/login | unknown email -> HTTP 401 code=INVALID_CREDENTIALS | no token issued
+T04 | GET /api/me | /me without token -> HTTP 401 code=TOKEN_REQUIRED | WWW-Authenticate=Bearer
+T04 | POST /api/posts | create without token -> HTTP 401 code=TOKEN_REQUIRED | WWW-Authenticate=Bearer
+T05 | POST /api/posts | Alice create -> HTTP 201 | Location=/api/posts/8 authorId=1 authorName=Alice
+T05 | GET /api/me | Alice /me -> HTTP 200 | user={'id': 1, 'name': 'Alice', 'email': 'alice@class.test'}
+T06 | PUT /api/posts/9 | Alice update own -> HTTP 200 | title='삭제 테스트 수정' createdAt unchanged=True authorId=1
+T06 | DELETE /api/posts/9 | Alice delete own -> HTTP 204 | body empty=True
+T06 | GET /api/posts/9 | deleted post gone -> HTTP 404 code=NOT_FOUND
+T07 | PUT /api/posts/8 | Bob update Alice post -> HTTP 403 code=FORBIDDEN
+T07 | data unchanged after 403: True
+T08 | DELETE /api/posts/8 | Bob delete Alice post -> HTTP 403 code=FORBIDDEN
+T08 | post still exists after 403: HTTP 200, unchanged=True
+T09 | GET /api/me | tampered signature -> HTTP 401 code=INVALID_TOKEN
+T09 | POST /api/posts | tampered signature -> HTTP 401 code=INVALID_TOKEN
+T09 | PUT /api/posts/8 | tampered signature -> HTTP 401 code=INVALID_TOKEN
+T09 | DELETE /api/posts/8 | tampered signature -> HTTP 401 code=INVALID_TOKEN
+T09 | data unchanged after tampered requests: True
+T11 | GET /api/me | /me after logout (no header) -> HTTP 401 code=TOKEN_REQUIRED
+T12 | POST /api/posts | extra field authorId -> HTTP 400 code=BAD_INPUT
+T12 | POST /api/posts | extra field userId -> HTTP 400 code=BAD_INPUT
+T12 | no forged post created: True
+T13 | POST /api/posts | empty title -> HTTP 400 code=BAD_INPUT
+T13 | POST /api/posts | whitespace content -> HTTP 400 code=BAD_INPUT
+T13 | POST /api/posts | title 101 chars -> HTTP 400 code=BAD_INPUT
+T13 | POST /api/posts | content 5001 chars -> HTTP 400 code=BAD_INPUT
+T13 | PUT /api/posts/8 | whitespace title on own post -> HTTP 400 code=BAD_INPUT
+T13 | data unchanged after 400: True
+T14 | GET /api/posts/999999 | missing id read -> HTTP 404 code=NOT_FOUND
+T14 | PUT /api/posts/999999 | missing id update, valid token -> HTTP 404 code=NOT_FOUND
+T14 | DELETE /api/posts/999999 | missing id delete, valid token -> HTTP 404 code=NOT_FOUND
+T14 | GET /api/posts/abc | bad id format -> HTTP 400 code=BAD_INPUT
+T14 | PUT /api/posts/999999 | missing id update, no token -> HTTP 401 code=TOKEN_REQUIRED
+EXTRA | PUT /api/posts/8 | Bob sends blank title to Alice post -> HTTP 403 code=FORBIDDEN
+T17 | PUT /api/posts/8 | update without token -> HTTP 401 code=TOKEN_REQUIRED
+T17 | DELETE /api/posts/8 | delete without token -> HTTP 401 code=TOKEN_REQUIRED
+T17 | POST /api/posts | Bob create own -> HTTP 201 | authorId=2
+T17 | PUT /api/posts/10 | Bob update own -> HTTP 200
+T17 | DELETE /api/posts/10 | Bob delete own -> HTTP 204 | body empty=True
+T15 | persistence post created: id=11 createdAt=2026-10-24T17:50:32.343Z
+
+--- phase: persist (after real server stop and restart) 2026-10-24T17:50:45.419976+00:00 UTC ---
+T15 | GET /api/posts/11 | post after server restart -> HTTP 200 | title='재시작 유지 확인' authorName=Alice createdAt unchanged=True
+
+--- phase: expiry (server restarted with TOKEN_TTL=3) 2026-10-24T17:50:57.741299+00:00 UTC ---
+T10 | login Alice -> HTTP 200, expiresIn=3, token=eyJhbGciOiJI..(masked)..7gPP1E
+T10 | immediate GET /api/me -> HTTP 200 (still valid)
+T10 | waiting 6 seconds for the token to expire...
+T10 | GET /api/me | expired token -> HTTP 401 code=TOKEN_EXPIRED | WWW-Authenticate=Bearer
+T10 | POST /api/posts | expired token -> HTTP 401 code=TOKEN_EXPIRED | WWW-Authenticate=Bearer
+T10 | PUT /api/posts/11 | expired token -> HTTP 401 code=TOKEN_EXPIRED | WWW-Authenticate=Bearer
+T10 | DELETE /api/posts/11 | expired token -> HTTP 401 code=TOKEN_EXPIRED | WWW-Authenticate=Bearer
+T10 | data unchanged after expired requests: True
+
+--- UI screen check (main) at 2026-10-24T19:08:06.360Z, built frontend at 4173, Chromium via Playwright ---
+UI-01 | public board, no login: posts visible = 3, header shows logged-out = true
+UI-02 | after Alice login: name shown = true, message = 로그인했습니다.
+UI-03 | create via UI: message = 게시글을 저장했습니다., posts now = 4
+UI-03 | own post detail: edit button visible = true
+T16  | after refresh: posts kept = 4, login cleared = true
+UI-05 | Bob viewing Alice post: Bob logged in = true, edit button visible = false, delete button visible = false
+UI-06 | after logout: message = 이 탭의 로그인 상태를 해제했습니다., logged out shown = true
+
+--- UI screen check (expiry) at 2026-10-24T19:08:30.336Z, built frontend at 4173, Chromium via Playwright ---
+T10  | logged in with TTL=3 server: 로그인했습니다.
+T10  | after expiry, protected call from UI: message = 로그인 시간이 만료되었습니다. 다시 로그인하세요., login state cleared = true
+

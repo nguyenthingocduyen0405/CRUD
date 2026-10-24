@@ -1,0 +1,26 @@
+--- UI check (main) at 2026-10-24T19:08:06.360Z, Chromium via Playwright, tokens masked ---
+REQ  GET /api/posts | Authorization: (no Authorization header)
+RESP 200 GET /api/posts
+REQ  POST /api/auth/login | Authorization: (no Authorization header)
+RESP 200 POST /api/auth/login
+REQ  POST /api/posts | Authorization: Bearer eyJhbGciOiJI..(masked)..vdQ7dU
+RESP 201 POST /api/posts
+REQ  GET /api/posts | Authorization: Bearer eyJhbGciOiJI..(masked)..vdQ7dU
+RESP 200 GET /api/posts
+REQ  GET /api/posts/13 | Authorization: Bearer eyJhbGciOiJI..(masked)..vdQ7dU
+RESP 200 GET /api/posts/13
+REQ  GET /api/posts | Authorization: (no Authorization header)
+RESP 200 GET /api/posts
+REQ  POST /api/auth/login | Authorization: (no Authorization header)
+RESP 200 POST /api/auth/login
+REQ  GET /api/posts/13 | Authorization: Bearer eyJhbGciOiJI..(masked)..Xw7hd8
+RESP 200 GET /api/posts/13
+
+--- UI check (expiry) at 2026-10-24T19:08:30.336Z, Chromium via Playwright, tokens masked ---
+REQ  GET /api/posts | Authorization: (no Authorization header)
+RESP 200 GET /api/posts
+REQ  POST /api/auth/login | Authorization: (no Authorization header)
+RESP 200 POST /api/auth/login
+REQ  GET /api/me | Authorization: Bearer eyJhbGciOiJI..(masked)..1Q_Mrs
+RESP 401 GET /api/me
+
