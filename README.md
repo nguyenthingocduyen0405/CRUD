@@ -127,15 +127,17 @@ npm run preview
 
 ## 핵심 구현 설명
 
-로그인 폼의 email·password가 `frontend/src/api.js`의 `login`을 통해 POST /api/auth/login으로 전달되면, 서버는 제공된 비밀번호 검증 함수(`backend/src/users.js`)로 계정을 확인한 뒤 `backend/src/auth.js`의 `issueToken`이 HS256과 서버 환경변수 키로 JWT(sub·exp·iss·aud)를 발급합니다. 프론트는 토큰을 브라우저 메모리에만 보관하고 `authorizationHeaders`가 보호 요청마다 `Authorization: Bearer <JWT>` 헤더를 붙입니다. 서버의 `currentUserId`는 요청마다 헤더를 확인하여 알고리즘·서명·만료·iss·aud·sub를 라이브러리로 검증하고 실제 계정 존재까지 확인한 뒤 그 사용자 ID만 라우트에 넘깁니다. 글 등록 시 작성자는 이 검증된 ID로 서버가 저장하며, 수정·삭제는 `assertOwner`가 저장된 글의 authorId와 비교해 다르면 403으로 거부합니다. 상세 코드 설명은 보고서에 작성했습니다.
+로그인 폼의 email·password가 `frontend/src/api.js`의 `login`을 통해 POST /api/auth/login으로 전달되면, 서버는 제공된 비밀번호 검증 함수(`backend/src/users.js`)로 계정을 확인한 뒤 `backend/src/auth.js`의 `issueToken`이 HS256과 서버 환경변수 키로 JWT(sub·exp·iss·aud)를 발급합니다. 프론트는 토큰을 브라우저 메모리에만 보관하고 `authorizationHeaders`가 보호 요청마다 `Authorization: Bearer <JWT>` 헤더를 붙입니다. 서버의 `currentUserId`는 요청마다 헤더를 확인하여 알고리즘·서명·만료·iss·aud를 라이브러리로 검증하고, exp 존재·sub 형식과 실제 계정 존재를 추가 확인한 뒤 그 사용자 ID만 라우트에 넘깁니다. 글 등록 시 작성자는 이 검증된 ID로 서버가 저장하며, 수정·삭제는 `assertOwner`가 저장된 글의 authorId와 비교해 다르면 403으로 거부합니다. 상세 코드 설명은 보고서에 작성했습니다.
 
 ## AI 활용 요약과 참고 자료
 
 - AI 사용 여부: 사용
-- 도구와 사용 목적: Claude Code (Anthropic Claude). 시작 템플릿의 인증 TODO 구현(BE-01~03, FE-01~04), 실행·자동 검사, README 초안 작성에 사용
-- 반영 위치: `backend/src/auth.js` 전체, `frontend/src/api.js`의 `login`·`authorizationHeaders`·`request` 401 처리·`canEdit`, `frontend/src/App.vue`의 오류 안내·로그인 안내·배너 교체
-- 직접 수정·검증한 내용: AI가 제시한 예시 코드를 참고해 작성한 코드를 API 명세(docs/02_API명세.md)와 비교·검토하고, 자동 검사 48개 항목과 T01~T17 테스트를 직접 실행해 동작을 확인했습니다. 토큰 만료(`TOKEN_TTL=3`)·로그아웃·새로고침 시 세션 해제, Alice/Bob 작성자 권한 구분(403), 오류 code별 화면 안내를 수동으로 재확인했습니다.
-- 상세 활용 기록: 보고서의 AI 활용 절 참고
+- 도구와 모델: ChatGPT (GPT-6)
+- 전체 사용 범위: 과제 수행 중 코드 구현 방법과 예시 코드를 참고하는 데 AI를 활용하였으며, 작성한 코드의 동작 여부를 확인하였습니다.
+- 사용 목적: JWT 발급·검증과 사용자 권한 검사, 프런트엔드 로그인·토큰 관리·오류 응답 처리 등의 구현 방법 및 예시 코드 참고
+- 반영 위치: `backend/src/auth.js`, `frontend/src/api.js`, `frontend/src/App.vue`
+- 검토 및 검증: AI가 제시한 구현 방법과 예시 코드를 참고한 후 API 명세와 비교하고, 보고서에 기록된 자동 검사 48개 항목 및 T01~T17 시나리오 결과로 기능 동작을 확인하였습니다.
+- 대표 활용 사례와 상세 기록: `docs/report.pdf`의 「5 AI 활용과 참고 자료」 참고
 - 참고한 수업 자료·외부 코드·공식 문서: 수업 제공 시작 템플릿과 API 명세(docs/), jsonwebtoken 문서 https://github.com/auth0/node-jsonwebtoken, Vite 문서 https://vite.dev/guide/
 
 ## 제출 확인
