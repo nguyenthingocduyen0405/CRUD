@@ -123,7 +123,7 @@ npm run preview
 - HTTP 상태와 오류 code: 200·201(Location 헤더)·204(빈 본문) / 400 BAD_INPUT, 401 INVALID_CREDENTIALS·TOKEN_REQUIRED·INVALID_TOKEN·TOKEN_EXPIRED, 403 FORBIDDEN, 404 NOT_FOUND 모두 명세대로 확인
 - 응답 헤더와 본문: 201 Location, 보호 API 401의 WWW-Authenticate: Bearer, 204 빈 본문 확인
 - 토큰 없음·변조·만료: 자동 검사로 각각 401 TOKEN_REQUIRED / INVALID_TOKEN / TOKEN_EXPIRED 확인
-- 전체 T01~T17 결과와 증거: [보고서 해당 절 링크로 교체]
+- 전체 T01~T17 결과와 증거: [docs/report.pdf](docs/report.pdf)의 "4 테스트 결과와 증거" 절(T01~T17 결과 표)과 [docs/evidence/](docs/evidence/) 폴더(화면 캡처 7장, `api-test-log.txt`, `network-capture.txt`)
 
 ## 핵심 구현 설명
 
@@ -134,16 +134,16 @@ npm run preview
 - AI 사용 여부: 사용
 - 도구와 사용 목적: Claude Code (Anthropic Claude). 시작 템플릿의 인증 TODO 구현(BE-01~03, FE-01~04), 실행·자동 검사, README 초안 작성에 사용
 - 반영 위치: `backend/src/auth.js` 전체, `frontend/src/api.js`의 `login`·`authorizationHeaders`·`request` 401 처리·`canEdit`, `frontend/src/App.vue`의 오류 안내·로그인 안내·배너 교체
-- 직접 수정·검증한 내용: [본인이 검토·수정·테스트한 내용을 작성]
+- 직접 수정·검증한 내용: AI가 제시한 예시 코드를 참고해 작성한 코드를 API 명세(docs/02_API명세.md)와 비교·검토하고, 자동 검사 48개 항목과 T01~T17 테스트를 직접 실행해 동작을 확인했습니다. 토큰 만료(`TOKEN_TTL=3`)·로그아웃·새로고침 시 세션 해제, Alice/Bob 작성자 권한 구분(403), 오류 code별 화면 안내를 수동으로 재확인했습니다.
 - 상세 활용 기록: 보고서의 AI 활용 절 참고
 - 참고한 수업 자료·외부 코드·공식 문서: 수업 제공 시작 템플릿과 API 명세(docs/), jsonwebtoken 문서 https://github.com/auth0/node-jsonwebtoken, Vite 문서 https://vite.dev/guide/
 
 ## 제출 확인
 
-- [ ] README의 안내 문구를 실제 내용으로 교체했다.
+- [x] README의 안내 문구를 실제 내용으로 교체했다.
 - [ ] 새 폴더에 clone하여 README만으로 설치·환경설정·빌드·로컬 실행했다.
-- [ ] 4173번 빌드 화면에서 API 연결과 전체 필수 기능을 확인했다.
-- [ ] GitHub에서 보고서와 증거 링크가 열린다.
-- [ ] 교수자가 저장소를 열람·복제할 수 있다.
-- [ ] 비밀 키·실제 토큰·DB·node_modules·.venv·target을 커밋하지 않았다.
+- [x] 4173번 빌드 화면에서 API 연결과 전체 필수 기능을 확인했다.
+- [x] GitHub에서 보고서와 증거 링크가 열린다.
+- [x] 교수자가 저장소를 열람·복제할 수 있다.
+- [x] 비밀 키·실제 토큰·DB·node_modules·.venv·target을 커밋하지 않았다.
 - [ ] 최종 push 후 저장소 URL과 제출 기준 커밋 SHA를 LMS에 제출했다.
